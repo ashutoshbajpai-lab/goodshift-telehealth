@@ -17,7 +17,6 @@ import {
   Button,
   Card,
   BottomSheet,
-  DoctorCard,
 } from '../../components';
 import {
   Calendar,
@@ -237,12 +236,6 @@ export default function ScheduleScreen() {
                 ))}
               </View>
             </View>
-
-            {/* Matched Doctor Preview Card */}
-            <Text style={[typography.smallBold, styles.assignedDocHeader]}>
-              Assigned Telehealth Physician
-            </Text>
-            <DoctorCard doctor={assignedDoctor} compact />
 
             {/* Priority Connect Explanation */}
             <Card variant="tint" style={styles.priorityNoteCard}>
