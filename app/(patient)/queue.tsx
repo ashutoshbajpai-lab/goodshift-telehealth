@@ -160,9 +160,11 @@ export default function QueueScreen() {
     return () => clearInterval(commentInterval);
   }, []);
 
-  // Monitor transition to 'matched'
+  // Monitor transition to 'matched' or 'inCall'
   useEffect(() => {
-    if (store.callState === 'matched' || store.callState === 'connecting' || store.callState === 'inCall') {
+    if (store.callState === 'inCall') {
+      router.replace('/(patient)/call');
+    } else if (store.callState === 'matched' || store.callState === 'connecting') {
       router.replace('/(patient)/matched');
     }
   }, [store.callState]);

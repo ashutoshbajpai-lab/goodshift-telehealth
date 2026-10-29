@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Image,
   useWindowDimensions,
   Alert,
+  PanResponder,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Svg, { Line, Circle, Rect, Polyline, Text as SvgText } from 'react-native-svg';
@@ -51,6 +52,9 @@ import {
   Calendar,
   Layers,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
 } from 'lucide-react-native';
 
 const REASON_SUGGESTIONS = [
@@ -76,6 +80,27 @@ export default function DoctorWorkspaceScreen() {
   const router = useRouter();
   const store = useConsultationStore();
   const { width } = useWindowDimensions();
+
+  // Adjustable viewing split for Left (Video) vs Right (Clinical Panel)
+  const [videoSplitPercent, setVideoSplitPercent] = useState<number>(40);
+  const splitRef = useRef(40);
+  splitRef.current = videoSplitPercent;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_evt, gestureState) => {
+        const totalW = width || 1000;
+        const deltaPct = (gestureState.dx / totalW) * 100;
+        const target = Math.max(20, Math.min(75, Math.round(splitRef.current + deltaPct)));
+        setVideoSplitPercent(target);
+      },
+    })
+  ).current;
+
+  // Dynamic video box height based on column width
+  const dynamicVideoHeight = Math.max(180, Math.min(420, Math.round(160 + (videoSplitPercent - 20) * 4.6)));
 
   // Active tab on right panel
   const [activeTab, setActiveTab] = useState<
@@ -210,6 +235,37 @@ export default function DoctorWorkspaceScreen() {
         </View>
 
         <View style={styles.headerRight}>
+          {/* Quick Viewing Size Switcher Presets */}
+          <View style={styles.layoutControlGroup}>
+            <SlidersHorizontal size={13} color={colors.ink} style={{ marginLeft: 6 }} />
+            <Text style={styles.layoutControlLabel}>VIEW:</Text>
+            {[
+              { label: '25:75', val: 25, hint: 'Data Focus (25% Video)' },
+              { label: '40:60', val: 40, hint: 'Standard (40% Video)' },
+              { label: '50:50', val: 50, hint: 'Equal Split (50% Video)' },
+              { label: '65:35', val: 65, hint: 'Video Focus (65% Video)' },
+            ].map((preset) => (
+              <TouchableOpacity
+                key={preset.label}
+                onPress={() => setVideoSplitPercent(preset.val)}
+                style={[
+                  styles.splitPresetBtn,
+                  videoSplitPercent === preset.val && styles.splitPresetBtnActive,
+                ]}
+                accessibilityLabel={preset.hint}
+              >
+                <Text
+                  style={[
+                    styles.splitPresetText,
+                    videoSplitPercent === preset.val && styles.splitPresetTextActive,
+                  ]}
+                >
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <StatusDot
             status={store.networkQuality}
             size={10}
@@ -231,12 +287,12 @@ export default function DoctorWorkspaceScreen() {
         </View>
       </View>
 
-      {/* Main Workspace Split: Left 40% (Video), Right 60% (Tabbed Panel) */}
+      {/* Main Workspace Split: Adjustable Left (Video) & Right (Tabbed Panel) */}
       <View style={styles.workspaceBody}>
-        {/* ================= LEFT 40%: VIDEO & VITALS ================= */}
-        <View style={styles.leftCol}>
+        {/* ================= LEFT: VIDEO & VITALS ================= */}
+        <View style={[styles.leftCol, { width: `${videoSplitPercent}%` }]}>
           {/* Patient Video Box */}
-          <View style={styles.patientVideoWrapper}>
+          <View style={[styles.patientVideoWrapper, { height: dynamicVideoHeight }]}>
             {store.isPatientCameraOff || store.callMode === 'audio' ? (
               <View style={styles.patientAvatarFallback}>
                 <View style={styles.patientInitialsCircle}>
@@ -409,8 +465,43 @@ export default function DoctorWorkspaceScreen() {
           </View>
         </View>
 
-        {/* ================= RIGHT 60%: TABBED CLINICAL PANEL ================= */}
-        <View style={styles.rightCol}>
+        {/* ================= INTERACTIVE RESIZE DIVIDER ================= */}
+        <View style={styles.resizeDivider} {...panResponder.panHandlers}>
+          <TouchableOpacity
+            onPress={() => setVideoSplitPercent((prev) => Math.max(20, prev - 5))}
+            style={styles.dividerStepBtn}
+            accessibilityLabel="Expand information panel"
+          >
+            <ChevronLeft size={12} color={colors.ink} />
+          </TouchableOpacity>
+
+          <View style={styles.dividerGripGroup}>
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+          </View>
+
+          <View style={styles.dividerPercentBadge}>
+            <Text style={styles.dividerPercentText}>{videoSplitPercent}%</Text>
+          </View>
+
+          <View style={styles.dividerGripGroup}>
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setVideoSplitPercent((prev) => Math.min(75, prev + 5))}
+            style={styles.dividerStepBtn}
+            accessibilityLabel="Expand patient video"
+          >
+            <ChevronRight size={12} color={colors.ink} />
+          </TouchableOpacity>
+        </View>
+
+        {/* ================= RIGHT: TABBED CLINICAL PANEL (RESIZABLE) ================= */}
+        <View style={[styles.rightCol, { flex: 1 }]}>
           {/* Panel Tab Navigation Bar */}
           <View style={styles.tabsBar}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -1149,6 +1240,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  layoutControlGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.full,
+    padding: 2,
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
+    marginRight: 12,
+  },
+  layoutControlLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.ink,
+    paddingHorizontal: 5,
+  },
+  splitPresetBtn: {
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+  },
+  splitPresetBtnActive: {
+    backgroundColor: colors.accent,
+  },
+  splitPresetText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.inkSecondary,
+  },
+  splitPresetTextActive: {
+    color: colors.ink,
+    fontWeight: '800',
+  },
   timeCounter: {
     backgroundColor: colors.surfaceTint,
     paddingHorizontal: 10,
@@ -1169,15 +1293,61 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   leftCol: {
-    width: '40%',
     borderRightWidth: 1,
     borderRightColor: colors.line,
     padding: 12,
     backgroundColor: '#FAFAFA',
   },
+  resizeDivider: {
+    width: 24,
+    backgroundColor: '#F1F5F9',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 50,
+  },
+  dividerStepBtn: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.bg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  dividerGripGroup: {
+    alignItems: 'center',
+    marginVertical: 4,
+    gap: 4,
+  },
+  gripDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.inkSecondary,
+    opacity: 0.5,
+  },
+  dividerPercentBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
+    alignItems: 'center',
+    marginVertical: 6,
+  },
+  dividerPercentText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: colors.ink,
+  },
   patientVideoWrapper: {
     width: '100%',
-    height: 240,
     backgroundColor: '#1E293B',
     borderRadius: radius.card,
     overflow: 'hidden',
@@ -1356,7 +1526,6 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   rightCol: {
-    width: '60%',
     flex: 1,
     backgroundColor: colors.bg,
   },

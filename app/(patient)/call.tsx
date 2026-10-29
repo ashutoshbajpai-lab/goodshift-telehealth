@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { CameraView } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { colors, radius, shadows, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore, CallMode } from '../../store/consultationStore';
 import { mockDoctors } from '../../mock/doctors';
@@ -53,6 +53,7 @@ import {
 export default function PatientInCallScreen() {
   const router = useRouter();
   const store = useConsultationStore();
+  const [permission] = useCameraPermissions();
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
 
@@ -263,10 +264,22 @@ export default function PatientInCallScreen() {
               </View>
             ) : (
               <View style={styles.selfCameraContainer}>
-                <CameraView
-                  style={styles.selfCamera}
-                  facing={store.facingMode}
-                />
+                {Platform.OS !== 'web' && permission?.granted && !store.devSimulatePermissionDenied ? (
+                  <CameraView
+                    style={styles.selfCamera}
+                    facing={store.facingMode}
+                  />
+                ) : (
+                  <Image
+                    source={{
+                      uri: store.facingMode === 'front'
+                        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240&q=80'
+                        : 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=240&q=80',
+                    }}
+                    style={styles.selfCamera}
+                    resizeMode="cover"
+                  />
+                )}
                 <TouchableOpacity
                   onPress={() => store.flipCamera()}
                   style={styles.selfFlipIcon}

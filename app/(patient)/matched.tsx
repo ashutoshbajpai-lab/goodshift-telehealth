@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Animated,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, radius, spacing, typography } from '../../theme/tokens';
