@@ -61,7 +61,7 @@ export default function RootLayout() {
             accessibilityLabel="Long press for developer panel"
           >
             <View style={styles.brandDot} />
-            <Text style={styles.brandName}>Elevate</Text>
+            <Text style={styles.brandName}>Good Shift</Text>
             <Text style={styles.brandSub}>GLP-1</Text>
           </TouchableOpacity>
 

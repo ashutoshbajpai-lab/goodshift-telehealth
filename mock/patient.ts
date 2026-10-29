@@ -40,7 +40,7 @@ export const mockPatient: PatientProfile = {
   weeksOnProgram: 12,
   weeklyAvgWeightChangeKg: -0.5,
   adherencePercent: 82,
-  programName: 'Elevate GLP-1 Medical Weight Care',
+  programName: 'Good Shift GLP-1 Medical Weight Care',
   currentDoseStep: 2, // e.g. 0.5mg or Step 2
   medicationName: 'Semaglutide 0.5 mg pen',
   lastDoseText: 'Yesterday (Day 6 of cycle)',

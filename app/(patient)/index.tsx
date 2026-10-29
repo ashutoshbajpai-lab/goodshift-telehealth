@@ -69,7 +69,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TopBar title="Elevate Health" />
+      <TopBar title="Good Shift Care" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Patient Greeting */}

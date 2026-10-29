@@ -220,9 +220,9 @@ export interface ConsultationStoreState {
 }
 
 const STORAGE_KEYS = {
-  SCHEDULED_BOOKING: '@elevate_scheduled_booking_v1',
-  HISTORY: '@elevate_history_v1',
-  CONSENT: '@elevate_consent_v1',
+  SCHEDULED_BOOKING: '@goodshift_scheduled_booking_v1',
+  HISTORY: '@goodshift_history_v1',
+  CONSENT: '@goodshift_consent_v1',
 };
 
 const DEFAULT_CONSENT: Record<string, boolean> = {

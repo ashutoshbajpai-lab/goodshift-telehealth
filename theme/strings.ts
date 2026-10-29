@@ -2,7 +2,7 @@ export type Language = 'en' | 'hi';
 
 export const strings = {
   en: {
-    brandName: 'Elevate GLP-1 Care',
+    brandName: 'Good Shift GLP-1 Care',
     greeting: 'Hello, Priya',
     consultNow: 'Consult now',
     joinScheduledCall: 'Join scheduled call',
@@ -86,7 +86,7 @@ export const strings = {
     summaryReady: 'Your consultation summary is ready.',
   },
   hi: {
-    brandName: 'एलीवेट GLP-1 केयर',
+    brandName: 'गुड शिफ्ट GLP-1 केयर',
     greeting: 'नमस्ते, प्रिया',
     consultNow: 'अभी परामर्श लें',
     joinScheduledCall: 'शेड्यूल कॉल में शामिल हों',

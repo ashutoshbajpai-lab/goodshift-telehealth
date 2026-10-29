@@ -1,4 +1,4 @@
-# Elevate GLP-1 Video Consultation App Prototype
+# Good Shift GLP-1 Video Consultation App Prototype
 
 Clickable, end-to-end working prototype of an in-app telehealth video consultation product designed for an evidence-based GLP-1 medical weight management programme in India.
 
@@ -45,7 +45,7 @@ Both applications read and write to the same unified **Zustand Store** (`store/c
 ## 3. Developer Testing Panel
 
 To test edge states without waiting for real network drops or queue count-downs:
-1. **Long-press the App Logo** (`Elevate GLP-1`) on any screen, or tap the **Wrench Icon** (`🔧`) in the top switcher bar.
+1. **Long-press the App Logo** (`Good Shift GLP-1`) on any screen, or tap the **Wrench Icon** (`🔧`) in the top switcher bar.
 2. The modal lets you force states on demand:
    - **Network Quality Simulation:** `Good`, `Fair`, `Weak` (triggers audio fallback suggestions), `Offline` (triggers call drop and auto-reconnect).
    - **Force Call Drop:** Simulates a sudden disconnection, initiates the 60-second reconnect window, auto-retries every 3 seconds, and reconnects to the same physician without returning to the queue.

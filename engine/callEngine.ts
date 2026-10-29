@@ -173,7 +173,7 @@ class CallEngineController {
 
       const updatedHistory = [record, ...store.consultationHistory];
       useConsultationStore.setState({ consultationHistory: updatedHistory });
-      await AsyncStorage.setItem('@elevate_history_v1', JSON.stringify(updatedHistory));
+      await AsyncStorage.setItem('@goodshift_history_v1', JSON.stringify(updatedHistory));
 
       if (onNotification) {
         onNotification('Summary Ready', 'Your consultation summary is ready.');
@@ -209,7 +209,7 @@ class CallEngineController {
 
       const updatedHistory = [record, ...useConsultationStore.getState().consultationHistory];
       useConsultationStore.setState({ consultationHistory: updatedHistory });
-      await AsyncStorage.setItem('@elevate_history_v1', JSON.stringify(updatedHistory));
+      await AsyncStorage.setItem('@goodshift_history_v1', JSON.stringify(updatedHistory));
 
       if (onNotification) {
         onNotification('Summary Ready', 'Your consultation summary is ready.');

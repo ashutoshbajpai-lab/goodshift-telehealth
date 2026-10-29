@@ -23,7 +23,7 @@ export const BrandedDoctorBackground: React.FC<BrandedDoctorBackgroundProps> = (
     >
       {showBranding && (
         <View style={styles.watermarkContainer}>
-          <Text style={styles.watermarkLogo}>Elevate GLP-1 Care</Text>
+          <Text style={styles.watermarkLogo}>Good Shift GLP-1 Care</Text>
           <Text style={styles.watermarkTagline}>Clinical Telehealth Consultation</Text>
         </View>
       )}

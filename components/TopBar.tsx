@@ -52,7 +52,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               accessibilityLabel="Brand Logo - long press for dev panel"
               style={styles.logoRow}
             >
-              <Text style={styles.logoText}>Elevate</Text>
+              <Text style={styles.logoText}>Good Shift</Text>
               <View style={styles.logoDot} />
               <Text style={styles.logoSubtext}>GLP-1</Text>
             </TouchableOpacity>
