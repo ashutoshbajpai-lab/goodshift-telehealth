@@ -5,10 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Animated,
+  Easing,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { colors, radius, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore } from '../../store/consultationStore';
 import {
@@ -22,24 +23,24 @@ import {
 } from '../../components';
 import {
   Clock,
-  Users,
   Upload,
   FileText,
   Sparkles,
-  ChevronLeft,
-  ChevronRight,
   AlertCircle,
-  CheckCircle2,
   Calendar,
   LogOut,
   HelpCircle,
   Quote,
+  ShieldCheck,
+  Hourglass,
+  ArrowRight,
+  Activity,
 } from 'lucide-react-native';
 
 const CAROUSEL_SLIDES = [
   {
     type: 'brand',
-    title: 'Precision GLP-1 Care',
+    title: 'Good Shift Precision Care',
     tagline: 'Doctor-guided medical weight management calibrated to your biology.',
     icon: <Sparkles size={28} color={colors.accent} />,
     bg: colors.surfaceTint,
@@ -67,6 +68,39 @@ const CAROUSEL_SLIDES = [
   },
 ];
 
+const REALTIME_COMMENTS = [
+  {
+    title: 'Matching Doctor',
+    comment: 'Matching with an on-duty Good Shift physician (Hindi & English)...',
+    pct: 28,
+  },
+  {
+    title: 'Syncing Vitals',
+    comment: 'Syncing your 12-week weight trajectory, dose logs and meal entries...',
+    pct: 46,
+  },
+  {
+    title: 'DPDP Security',
+    comment: 'Encrypting your shared medical parameters with AES-256...',
+    pct: 64,
+  },
+  {
+    title: 'Symptom Triage',
+    comment: 'Doctor reviewing reported nausea (2x) and low hydration status...',
+    pct: 82,
+  },
+  {
+    title: 'Video Calibration',
+    comment: 'Calibrating high-definition audio and video bandwidth...',
+    pct: 95,
+  },
+  {
+    title: 'Ready to Connect',
+    comment: "You're next in line! Dr. Ananya Sen is ready for your visit...",
+    pct: 99,
+  },
+];
+
 export default function QueueScreen() {
   const router = useRouter();
   const store = useConsultationStore();
@@ -74,6 +108,57 @@ export default function QueueScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [leaveSheetOpen, setLeaveSheetOpen] = useState(false);
+
+  // Realtime comments cycle index
+  const [commentIndex, setCommentIndex] = useState(0);
+
+  // Animated spinner rotation
+  const spinValue = useRef(new Animated.Value(0)).current;
+
+  // Comment fade animation
+  const commentFade = useRef(new Animated.Value(1)).current;
+
+  // Pulse animation for inner ring
+  const pulseScale = useRef(new Animated.Value(1)).current;
+
+  // Run infinite smooth spinner rotation
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 3200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseScale, { toValue: 1.06, duration: 1200, useNativeDriver: true }),
+        Animated.timing(pulseScale, { toValue: 0.96, duration: 1200, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+
+  // Cycle realtime comments every 2.6 seconds with fade animation
+  useEffect(() => {
+    const commentInterval = setInterval(() => {
+      Animated.timing(commentFade, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => {
+        setCommentIndex((prev) => (prev + 1) % REALTIME_COMMENTS.length);
+        Animated.timing(commentFade, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 2800);
+
+    return () => clearInterval(commentInterval);
+  }, []);
 
   // Monitor transition to 'matched'
   useEffect(() => {
@@ -121,6 +206,19 @@ export default function QueueScreen() {
   };
 
   const currentSlide = CAROUSEL_SLIDES[activeSlide];
+  const activeComment = REALTIME_COMMENTS[commentIndex];
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  // Circular progress math (radius = 58, circ = ~364.4)
+  const radiusVal = 58;
+  const strokeWidth = 9;
+  const circumference = 2 * Math.PI * radiusVal;
+  const progressPercent = activeComment.pct;
+  const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
 
   return (
     <View style={styles.container}>
@@ -131,23 +229,99 @@ export default function QueueScreen() {
       <ProgressBar currentStep={4} totalSteps={4} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Live Queue Position & Wait Banner */}
-        <Card variant="tint" style={styles.queueStatusCard}>
-          <View style={styles.queueLiveRow}>
+        {/* Realtime Progressive Circular Spinner Card (Hybrid Progress Indicator) */}
+        <Card variant="tint" style={styles.spinnerCard}>
+          {/* Header live badge */}
+          <View style={styles.liveTagRow}>
             <View style={styles.pulseDot} />
-            <Text style={[typography.caption, styles.liveBadgeText]}>LIVE WAITING QUEUE</Text>
+            <Text style={[typography.caption, styles.liveTagText]}>
+              REAL-TIME QUEUE ACTIVE
+            </Text>
           </View>
 
-          <Text style={[typography.display, styles.positionNumber]}>
-            {store.queuePosition <= 1 ? "You're Next in Line!" : `You are number ${store.queuePosition}`}
-          </Text>
+          {/* Center Stage: Rotating Circular Progress Ring */}
+          <View style={styles.circleStage}>
+            <Animated.View
+              style={[
+                styles.spinnerRotator,
+                { transform: [{ rotate: spin }] },
+              ]}
+            >
+              <Svg width={148} height={148}>
+                <Defs>
+                  <LinearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <Stop offset="0%" stopColor={colors.accentSoft} />
+                    <Stop offset="100%" stopColor={colors.accent} />
+                  </LinearGradient>
+                </Defs>
 
+                {/* Background Track */}
+                <Circle
+                  cx="74"
+                  cy="74"
+                  r={radiusVal}
+                  stroke={colors.line}
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                />
+
+                {/* Animated Progress Ring */}
+                <Circle
+                  cx="74"
+                  cy="74"
+                  r={radiusVal}
+                  stroke="url(#accentGrad)"
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${circumference} ${circumference}`}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  fill="none"
+                  transform="rotate(-90 74 74)"
+                />
+              </Svg>
+            </Animated.View>
+
+            {/* Inner Content Inside the Circle */}
+            <Animated.View
+              style={[
+                styles.circleCenterContent,
+                { transform: [{ scale: pulseScale }] },
+              ]}
+            >
+              <Text style={styles.circleNumber}>
+                #{store.queuePosition}
+              </Text>
+              <Text style={styles.circleLabel}>
+                {progressPercent}% Ready
+              </Text>
+            </Animated.View>
+          </View>
+
+          {/* Realtime Changing Text Comments Strip */}
+          <View style={styles.commentStrip}>
+            <View style={styles.commentHeaderRow}>
+              <Activity size={14} color={colors.accent} />
+              <Text style={styles.commentStepTag}>
+                {activeComment.title.toUpperCase()}
+              </Text>
+            </View>
+
+            <Animated.Text
+              style={[
+                typography.bodyBold,
+                styles.commentText,
+                { opacity: commentFade },
+              ]}
+            >
+              {activeComment.comment}
+            </Animated.Text>
+          </View>
+
+          {/* Estimated Wait Strip */}
           <View style={styles.waitDurationRow}>
-            <Clock size={16} color={colors.ink} />
-            <Text style={[typography.bodyBold, styles.waitDurationText]}>
-              {store.queuePosition <= 1
-                ? 'Doctor is preparing your consultation room...'
-                : `Estimated wait: ~${Math.max(1, Math.ceil(store.queueWaitSeconds / 60))} minute${Math.ceil(store.queueWaitSeconds / 60) > 1 ? 's' : ''}`}
+            <Clock size={15} color={colors.ink} />
+            <Text style={[typography.small, styles.waitDurationText]}>
+              Estimated wait: ~{Math.max(1, Math.ceil(store.queueWaitSeconds / 60))} minute{Math.ceil(store.queueWaitSeconds / 60) > 1 ? 's' : ''} • Priority queue moving
             </Text>
           </View>
 
@@ -160,7 +334,9 @@ export default function QueueScreen() {
             }}
             variant="primary"
             size="normal"
-            style={{ marginTop: 14, width: '92%' }}
+            icon={<ArrowRight size={16} color={colors.ink} />}
+            iconPosition="right"
+            style={styles.connectNowBtn}
           />
         </Card>
 
@@ -350,17 +526,25 @@ const styles = StyleSheet.create({
     padding: spacing.base,
     paddingBottom: 40,
   },
-  queueStatusCard: {
+  spinnerCard: {
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: 22,
+    paddingHorizontal: 16,
     marginBottom: 16,
     borderWidth: 1.5,
     borderColor: colors.accentSoft,
+    backgroundColor: colors.surfaceTint,
   },
-  queueLiveRow: {
+  liveTagRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    backgroundColor: colors.bg,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.chip,
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
+    marginBottom: 14,
   },
   pulseDot: {
     width: 8,
@@ -369,24 +553,91 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentStrong,
     marginRight: 6,
   },
-  liveBadgeText: {
-    color: colors.inkSecondary,
-    fontWeight: '700',
+  liveTagText: {
+    color: colors.ink,
+    fontWeight: '800',
     letterSpacing: 0.5,
+    fontSize: 10,
   },
-  positionNumber: {
+  circleStage: {
+    width: 148,
+    height: 148,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    marginVertical: 6,
+  },
+  spinnerRotator: {
+    width: 148,
+    height: 148,
+    position: 'absolute',
+  },
+  circleCenterContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bg,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  circleNumber: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: colors.ink,
+  },
+  circleLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.accent,
+    marginTop: 2,
+  },
+  commentStrip: {
+    width: '100%',
+    backgroundColor: colors.bg,
+    borderRadius: radius.card,
+    padding: 14,
+    marginVertical: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: 'center',
+  },
+  commentHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  commentStepTag: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.inkSecondary,
+    letterSpacing: 0.5,
+    marginLeft: 5,
+  },
+  commentText: {
     color: colors.ink,
     textAlign: 'center',
-    marginVertical: 4,
+    lineHeight: 20,
+    minHeight: 40,
   },
   waitDurationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginBottom: 12,
   },
   waitDurationText: {
-    color: colors.ink,
+    color: colors.inkSecondary,
     marginLeft: 6,
+  },
+  connectNowBtn: {
+    width: '100%',
+    marginTop: 4,
   },
   longWaitCard: {
     marginBottom: 16,
