@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,15 @@ import {
 import { useRouter } from 'expo-router';
 import { colors, radius, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore } from '../../store/consultationStore';
-import { TopBar, Button, Card, CountdownTimer } from '../../components';
+import { TopBar, Button, Card, CountdownTimer, BottomSheet } from '../../components';
 import {
   Video,
   Calendar,
   Clock,
   History,
-  AlertCircle,
-  TrendingDown,
   Sparkles,
-  ChevronRight,
+  Zap,
+  ArrowRight,
   ShieldCheck,
 } from 'lucide-react-native';
 
@@ -29,17 +28,36 @@ export default function HomeScreen() {
   const store = useConsultationStore();
   const { patient, scheduledBooking } = store;
 
-  // Track if scheduled call window is open (within 10 minutes or mock test toggle)
-  // For easy testing, we allow testers to simulate "within 10 min window"
+  // Track if scheduled call window is open
   const [forceWindowOpen, setForceWindowOpen] = useState(true);
+
+  // Bottom sheet modal for picking "Immediate" vs "Schedule a Slot"
+  const [consultTypeSheetOpen, setConsultTypeSheetOpen] = useState(false);
 
   const hasBooking = !!scheduledBooking;
   const isJoinWindowActive = hasBooking && forceWindowOpen;
 
   const handleStartConsultNow = () => {
-    // Reset to start of live consult flow
+    // Open choice sheet for user: Immediate vs Preferred Slot
+    setConsultTypeSheetOpen(true);
+  };
+
+  const handleChooseImmediate = () => {
+    setConsultTypeSheetOpen(false);
     store.startLiveCallProcess(false);
-    router.push('/(patient)/check');
+    router.push({
+      pathname: '/(patient)/check',
+      params: { flow: 'live' },
+    });
+  };
+
+  const handleChooseSchedule = () => {
+    setConsultTypeSheetOpen(false);
+    store.startLiveCallProcess(false);
+    router.push({
+      pathname: '/(patient)/check',
+      params: { flow: 'schedule' },
+    });
   };
 
   const handleJoinScheduled = () => {
@@ -69,16 +87,31 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TopBar title="Good Shift Care" />
+      {/* Mobile Top Bar with History Button at Top Right Corner */}
+      <TopBar
+        title="Good Shift Care"
+        rightElement={
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => router.push('/(patient)/history')}
+            style={styles.historyTopBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Open consultation history"
+          >
+            <History size={16} color={colors.ink} />
+            <Text style={[typography.caption, styles.historyTopText]}>History</Text>
+          </TouchableOpacity>
+        }
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Patient Greeting */}
+        {/* Patient Greeting Header */}
         <View style={styles.greetingHeader}>
           <Text style={[typography.display, styles.greeting]}>
             Hello, {patient.firstName}
           </Text>
           <Text style={[typography.body, styles.programBadge]}>
-            {patient.programName} • Week {patient.weeksOnProgram}
+            Good Shift Care • Personal Weight Health
           </Text>
         </View>
 
@@ -161,7 +194,7 @@ export default function HomeScreen() {
           </Card>
         )}
 
-        {/* Consult Now Section */}
+        {/* Primary Consult Action Section */}
         <View style={styles.consultActionSection}>
           <Button
             title="Consult now"
@@ -172,74 +205,74 @@ export default function HomeScreen() {
             style={styles.mainConsultBtn}
           />
           <Text style={[typography.caption, styles.waitNote]}>
-            Avg wait time: ~6 mins • Hindi & English physicians on duty
+            Instant doctor connect or preferred slot booking
           </Text>
         </View>
 
-        {/* Schedule a future slot shortcut if no booking exists */}
-        {!hasBooking && (
-          <TouchableOpacity
-            style={styles.scheduleSlotBanner}
-            onPress={() => router.push('/(patient)/schedule')}
-          >
-            <View style={styles.bannerLeft}>
-              <Calendar size={20} color={colors.ink} />
-              <View style={styles.bannerTextCol}>
-                <Text style={[typography.bodyBold, styles.bannerTitle]}>
-                  Prefer a planned appointment?
-                </Text>
-                <Text style={[typography.small, styles.bannerSubtitle]}>
-                  Book a confirmed slot for the next 7 days
-                </Text>
-              </View>
-            </View>
-            <ChevronRight size={18} color={colors.inkSecondary} />
-          </TouchableOpacity>
-        )}
-
-        {/* Clinical Snapshot for Patient Context */}
-        <Card style={styles.metricOverviewCard}>
-          <Text style={[typography.h2, styles.overviewTitle]}>Your GLP-1 Progress</Text>
-          <View style={styles.metricGrid}>
-            <View style={styles.metricItem}>
-              <View style={styles.metricIconCircle}>
-                <TrendingDown size={18} color={colors.accentStrong} />
-              </View>
-              <Text style={[typography.h1, styles.metricVal]}>83.0 kg</Text>
-              <Text style={[typography.caption, styles.metricLabel]}>-6 kg from start</Text>
-            </View>
-
-            <View style={styles.metricItem}>
-              <View style={styles.metricIconCircle}>
-                <ShieldCheck size={18} color={colors.success} />
-              </View>
-              <Text style={[typography.h1, styles.metricVal]}>Step 2</Text>
-              <Text style={[typography.caption, styles.metricLabel]}>Semaglutide 0.5 mg</Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* Shortcut to Consultation History */}
-        <TouchableOpacity
-          style={styles.historyLinkCard}
-          onPress={() => router.push('/(patient)/history')}
-        >
-          <View style={styles.historyLeft}>
-            <View style={styles.historyIconCircle}>
-              <History size={20} color={colors.ink} />
-            </View>
-            <View>
-              <Text style={[typography.bodyBold, styles.historyTitle]}>
-                Consultation history
-              </Text>
-              <Text style={[typography.small, styles.historySubtitle]}>
-                Past clinical notes, prescriptions & summaries
-              </Text>
-            </View>
-          </View>
-          <ChevronRight size={20} color={colors.inkSecondary} />
-        </TouchableOpacity>
+        {/* Clinical Quality Assurance Pill */}
+        <View style={styles.trustBadgeRow}>
+          <ShieldCheck size={16} color={colors.success} />
+          <Text style={[typography.caption, styles.trustBadgeText]}>
+            Licensed Telemedicine Physicians • Verified by MMC / DMC
+          </Text>
+        </View>
       </ScrollView>
+
+      {/* Consult Now Mode Selection Sheet: Immediate vs Schedule */}
+      <BottomSheet
+        visible={consultTypeSheetOpen}
+        onClose={() => setConsultTypeSheetOpen(false)}
+        title="Consultation Options"
+        subtitle="How would you like to connect with your physician today?"
+      >
+        <View style={styles.sheetOptionList}>
+          {/* Option 1: Right Now (Immediate) */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleChooseImmediate}
+            style={styles.optionCard}
+          >
+            <View style={styles.optionIconCircle}>
+              <Zap size={24} color={colors.ink} />
+            </View>
+            <View style={styles.optionTextCol}>
+              <View style={styles.optionTitleRow}>
+                <Text style={[typography.h2, styles.optionTitle]}>Right Now</Text>
+                <View style={styles.immediatePill}>
+                  <Text style={styles.immediatePillText}>~6 mins wait</Text>
+                </View>
+              </View>
+              <Text style={[typography.small, styles.optionSubtitle]}>
+                Immediate consult with the next available on-duty Good Shift doctor
+              </Text>
+            </View>
+            <ArrowRight size={18} color={colors.ink} style={styles.optionArrow} />
+          </TouchableOpacity>
+
+          {/* Option 2: Preferred Time Slot (Schedule) */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleChooseSchedule}
+            style={[styles.optionCard, styles.scheduleOptionCard]}
+          >
+            <View style={[styles.optionIconCircle, styles.scheduleIconCircle]}>
+              <Calendar size={24} color={colors.ink} />
+            </View>
+            <View style={styles.optionTextCol}>
+              <View style={styles.optionTitleRow}>
+                <Text style={[typography.h2, styles.optionTitle]}>Preferred Time Slot</Text>
+                <View style={styles.schedulePill}>
+                  <Text style={styles.schedulePillText}>Priority Connect</Text>
+                </View>
+              </View>
+              <Text style={[typography.small, styles.optionSubtitle]}>
+                Pick a convenient time slot in the next 7 days and skip the live queue when you join
+              </Text>
+            </View>
+            <ArrowRight size={18} color={colors.ink} style={styles.optionArrow} />
+          </TouchableOpacity>
+        </View>
+      </BottomSheet>
     </View>
   );
 }
@@ -252,6 +285,21 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.base,
     paddingBottom: 40,
+  },
+  historyTopBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceTint,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.chip,
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
+  },
+  historyTopText: {
+    color: colors.ink,
+    fontWeight: '700',
+    marginLeft: 6,
   },
   greetingHeader: {
     marginVertical: 14,
@@ -383,6 +431,7 @@ const styles = StyleSheet.create({
   },
   consultActionSection: {
     marginBottom: 20,
+    marginTop: 6,
   },
   mainConsultBtn: {
     width: '100%',
@@ -392,97 +441,86 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  scheduleSlotBanner: {
+  trustBadgeRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 14,
-    backgroundColor: colors.surfaceTint,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    borderColor: colors.accentSoft,
-    marginBottom: 20,
-  },
-  bannerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  bannerTextCol: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  bannerTitle: {
-    color: colors.ink,
-  },
-  bannerSubtitle: {
-    color: colors.inkSecondary,
-    marginTop: 2,
-  },
-  metricOverviewCard: {
-    marginBottom: 20,
-  },
-  overviewTitle: {
-    color: colors.ink,
-    marginBottom: 14,
-  },
-  metricGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  metricItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: colors.surfaceTint,
-    borderRadius: radius.card,
-    marginHorizontal: 4,
-  },
-  metricIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.bg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    paddingVertical: 8,
   },
-  metricVal: {
-    color: colors.ink,
-  },
-  metricLabel: {
+  trustBadgeText: {
     color: colors.inkSecondary,
-    marginTop: 2,
-    textAlign: 'center',
+    marginLeft: 6,
   },
-  historyLinkCard: {
+  sheetOptionList: {
+    paddingBottom: 24,
+  },
+  optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: colors.bg,
     borderRadius: radius.card,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  historyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  historyIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: colors.accent,
     backgroundColor: colors.surfaceTint,
+    marginBottom: 14,
+  },
+  scheduleOptionCard: {
+    borderColor: colors.line,
+    backgroundColor: colors.bg,
+  },
+  optionIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
   },
-  historyTitle: {
+  scheduleIconCircle: {
+    backgroundColor: colors.surfaceTint,
+  },
+  optionTextCol: {
+    flex: 1,
+  },
+  optionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  optionTitle: {
+    color: colors.ink,
+    marginRight: 8,
+  },
+  immediatePill: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: radius.chip,
+  },
+  immediatePillText: {
+    fontSize: 10,
+    fontWeight: '700',
     color: colors.ink,
   },
-  historySubtitle: {
+  schedulePill: {
+    backgroundColor: colors.surfaceTint,
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: radius.chip,
+  },
+  schedulePillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.ink,
+  },
+  optionSubtitle: {
     color: colors.inkSecondary,
-    marginTop: 2,
+    lineHeight: 18,
+  },
+  optionArrow: {
+    marginLeft: 10,
   },
 });

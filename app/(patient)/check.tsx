@@ -8,7 +8,7 @@ import {
   Animated,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { colors, radius, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore } from '../../store/consultationStore';
@@ -35,7 +35,9 @@ import {
 
 export default function DeviceCheckScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const store = useConsultationStore();
+  const isScheduleMode = params.flow === 'schedule';
 
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraChecked, setCameraChecked] = useState(false);
@@ -403,23 +405,45 @@ export default function DeviceCheckScreen() {
       {/* Bottom Action Footer */}
       <View style={styles.footer}>
         <View style={styles.footerButtons}>
-          <Button
-            title="Live now (Wait ~6m)"
-            onPress={handleLiveNowPress}
-            disabled={!allChecksPassed}
-            variant="primary"
-            size="large"
-            style={styles.footerBtn}
-          />
-
-          <Button
-            title="Schedule Slot"
-            onPress={handleSchedulePress}
-            disabled={!allChecksPassed}
-            variant="secondary"
-            size="large"
-            style={styles.footerBtn}
-          />
+          {isScheduleMode ? (
+            <>
+              <Button
+                title="Proceed to Schedule"
+                onPress={handleSchedulePress}
+                disabled={!allChecksPassed}
+                variant="primary"
+                size="large"
+                style={styles.footerBtn}
+              />
+              <Button
+                title="Switch to Live now"
+                onPress={handleLiveNowPress}
+                disabled={!allChecksPassed}
+                variant="secondary"
+                size="large"
+                style={styles.footerBtn}
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                title="Live now (Wait ~6m)"
+                onPress={handleLiveNowPress}
+                disabled={!allChecksPassed}
+                variant="primary"
+                size="large"
+                style={styles.footerBtn}
+              />
+              <Button
+                title="Schedule Slot"
+                onPress={handleSchedulePress}
+                disabled={!allChecksPassed}
+                variant="secondary"
+                size="large"
+                style={styles.footerBtn}
+              />
+            </>
+          )}
         </View>
       </View>
 
