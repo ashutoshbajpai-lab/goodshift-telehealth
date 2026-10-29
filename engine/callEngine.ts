@@ -70,7 +70,10 @@ class CallEngineController {
 
       if (store.callState === 'queued') {
         if (store.queueWaitSeconds > 0) {
-          const nextSec = store.queueWaitSeconds - 1;
+          // Accelerated prototype simulation: decrement by 20s every second
+          // so queue advances naturally from #3 -> #2 -> #1 -> Matched in ~15 seconds
+          const stepDown = store.queueWaitSeconds > 60 ? 25 : 8;
+          const nextSec = Math.max(0, store.queueWaitSeconds - stepDown);
           const nextPos = Math.max(1, Math.ceil(nextSec / 120));
           useConsultationStore.setState({
             queueWaitSeconds: nextSec,
@@ -78,8 +81,8 @@ class CallEngineController {
             isLongWaitTriggered: nextSec >= LONG_WAIT_THRESHOLD_SECS,
           });
 
-          // Match when time drops to near 0
-          if (nextSec <= 3) {
+          // Transition to matched when queue reaches front
+          if (nextSec <= 5) {
             this.transitionToMatched();
           }
         }

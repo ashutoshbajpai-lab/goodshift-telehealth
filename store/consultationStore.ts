@@ -550,16 +550,11 @@ export const useConsultationStore = create<ConsultationStoreState>((set, get) =>
 
   forceDoctorJoinsNow: () => {
     set({
-      callState: 'inCall',
+      callState: 'matched',
       activeDoctor: mockDoctors[0],
       queuePosition: 1,
       queueWaitSeconds: 0,
       networkQuality: 'good',
-    });
-    get().logEvent({
-      eventType: 'call started',
-      triggeredBy: 'doctor',
-      modeAfter: get().callMode,
     });
   },
 

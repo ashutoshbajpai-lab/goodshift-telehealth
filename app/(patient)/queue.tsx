@@ -139,15 +139,29 @@ export default function QueueScreen() {
           </View>
 
           <Text style={[typography.display, styles.positionNumber]}>
-            You are number {store.queuePosition}
+            {store.queuePosition <= 1 ? "You're Next in Line!" : `You are number ${store.queuePosition}`}
           </Text>
 
           <View style={styles.waitDurationRow}>
             <Clock size={16} color={colors.ink} />
             <Text style={[typography.bodyBold, styles.waitDurationText]}>
-              Estimated wait: ~{Math.ceil(store.queueWaitSeconds / 60)} minutes
+              {store.queuePosition <= 1
+                ? 'Doctor is preparing your consultation room...'
+                : `Estimated wait: ~${Math.max(1, Math.ceil(store.queueWaitSeconds / 60))} minute${Math.ceil(store.queueWaitSeconds / 60) > 1 ? 's' : ''}`}
             </Text>
           </View>
+
+          {/* Quick Connect Trigger */}
+          <Button
+            title="Connect With Doctor Now"
+            onPress={() => {
+              store.setCallState('matched');
+              router.replace('/(patient)/matched');
+            }}
+            variant="primary"
+            size="normal"
+            style={{ marginTop: 14, width: '92%' }}
+          />
         </Card>
 
         {/* Long Wait Fallback Offer */}

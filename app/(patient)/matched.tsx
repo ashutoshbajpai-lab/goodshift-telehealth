@@ -84,12 +84,19 @@ export default function DoctorMatchedScreen() {
         </Animated.View>
 
         {/* Connecting Spinner & Telemedicine Compliance Notice */}
-        <View style={styles.connectingBox}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            store.setCallState('inCall');
+            router.replace('/(patient)/call');
+          }}
+          style={styles.connectingBox}
+        >
           <ActivityIndicator size="small" color={colors.accent} />
           <Text style={[typography.bodyBold, styles.connectingText]}>
-            Establishing encrypted video feed...
+            Establishing encrypted video feed... (Enter Now)
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.complianceRow}>
           <ShieldCheck size={16} color={colors.success} />
