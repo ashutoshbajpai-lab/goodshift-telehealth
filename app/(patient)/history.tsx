@@ -91,9 +91,11 @@ export default function HistoryScreen() {
         {filtered.map((item) => (
           <TouchableOpacity
             key={item.id}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             onPress={() => setSelectedRecord(item)}
             style={styles.recordCardWrapper}
+            accessibilityRole="button"
+            accessibilityLabel={`Consultation record with ${item.doctorName} on ${item.date}, ${item.reason}`}
           >
             <Card style={styles.recordCard}>
               <View style={styles.recordHeader}>
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   searchBar: {
     flexDirection: 'row',
@@ -245,13 +247,15 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     borderRadius: radius.card,
     paddingHorizontal: 12,
-    height: 44,
+    minHeight: 48,
+    height: 48,
     marginBottom: 12,
   },
   searchInput: {
     flex: 1,
     marginLeft: 10,
     color: colors.ink,
+    fontSize: 16,
   },
   filterRow: {
     flexDirection: 'row',

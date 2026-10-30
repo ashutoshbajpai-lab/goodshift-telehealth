@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
+    minHeight: 52,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.line,

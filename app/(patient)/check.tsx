@@ -220,6 +220,8 @@ export default function DeviceCheckScreen() {
                 <TouchableOpacity
                   onPress={() => store.flipCamera()}
                   style={styles.flipBtn}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityRole="button"
                   accessibilityLabel="Flip camera"
                 >
                   <RotateCw size={18} color={colors.ink} />
@@ -338,12 +340,18 @@ export default function DeviceCheckScreen() {
                 <TouchableOpacity
                   onPress={() => handleConfirmSpeaker(true)}
                   style={styles.speakerChoiceBtn}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Yes, I heard the test tone"
                 >
                   <Text style={styles.speakerChoiceYes}>Yes</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleConfirmSpeaker(false)}
                   style={styles.speakerChoiceBtn}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="No, I did not hear the test tone"
                 >
                   <Text style={styles.speakerChoiceNo}>No</Text>
                 </TouchableOpacity>
@@ -513,7 +521,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 110,
+    paddingBottom: 120,
   },
   infoBox: {
     marginBottom: 16,
@@ -558,9 +566,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   flipBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.surfaceTint,
     alignItems: 'center',
     justifyContent: 'center',
@@ -661,13 +669,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   speakerChoiceBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 14,
+    minWidth: 48,
+    minHeight: 44,
     borderRadius: radius.chip,
     backgroundColor: colors.surfaceTint,
     marginLeft: 6,
     borderWidth: 1,
     borderColor: colors.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   speakerChoiceYes: {
     color: colors.success,
@@ -710,7 +721,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.bg,
     paddingHorizontal: spacing.base,
-    paddingVertical: 14,
+    paddingTop: 14,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
     borderTopWidth: 1,
     borderTopColor: colors.line,
   },

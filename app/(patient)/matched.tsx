@@ -86,12 +86,14 @@ export default function DoctorMatchedScreen() {
 
         {/* Connecting Spinner & Telemedicine Compliance Notice */}
         <TouchableOpacity
-          activeOpacity={0.8}
+          activeOpacity={0.7}
           onPress={() => {
             store.setCallState('inCall');
             router.replace('/(patient)/call');
           }}
           style={styles.connectingBox}
+          accessibilityRole="button"
+          accessibilityLabel="Establishing encrypted video feed, tap to enter consultation immediately"
         >
           <ActivityIndicator size="small" color={colors.accent} />
           <Text style={[typography.bodyBold, styles.connectingText]}>
@@ -156,9 +158,10 @@ const styles = StyleSheet.create({
   connectingBox: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surfaceTint,
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    minHeight: 48,
     borderRadius: radius.chip,
     borderWidth: 1,
     borderColor: colors.accentSoft,

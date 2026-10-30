@@ -283,9 +283,11 @@ export default function PatientInCallScreen() {
                 <TouchableOpacity
                   onPress={() => store.flipCamera()}
                   style={styles.selfFlipIcon}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityRole="button"
                   accessibilityLabel="Flip camera"
                 >
-                  <RotateCw size={12} color={colors.ink} />
+                  <RotateCw size={14} color={colors.ink} />
                 </TouchableOpacity>
               </View>
             )}
@@ -316,8 +318,11 @@ export default function PatientInCallScreen() {
               <TouchableOpacity
                 onPress={() => setRotatePromptVisible(false)}
                 style={styles.rotateCloseBtn}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Dismiss orientation tip"
               >
-                <X size={14} color={colors.inkSecondary} />
+                <X size={16} color={colors.inkSecondary} />
               </TouchableOpacity>
             </View>
           )}
@@ -332,6 +337,8 @@ export default function PatientInCallScreen() {
               <TouchableOpacity
                 onPress={() => store.setCallMode('audio', 'patient')}
                 style={styles.bannerActionBtn}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to audio mode"
               >
                 <Text style={styles.bannerActionText}>Switch</Text>
               </TouchableOpacity>
@@ -347,6 +354,8 @@ export default function PatientInCallScreen() {
               <TouchableOpacity
                 onPress={() => store.setCallMode('video', 'patient')}
                 style={styles.bannerActionBtn}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to video mode"
               >
                 <Text style={styles.bannerActionText}>Video</Text>
               </TouchableOpacity>
@@ -718,6 +727,7 @@ const styles = StyleSheet.create({
   },
   mainArea: {
     flex: 1,
+    flexDirection: 'column',
   },
   landscapeRow: {
     flexDirection: 'row',
@@ -830,6 +840,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 88,
     height: 120,
+    minWidth: 84,
+    minHeight: 110,
     borderRadius: radius.card,
     overflow: 'hidden',
     borderWidth: 2,
@@ -837,6 +849,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     zIndex: 20,
     ...shadows.soft,
+    elevation: 10,
   },
   selfCameraContainer: {
     flex: 1,
@@ -850,11 +863,13 @@ const styles = StyleSheet.create({
     top: 6,
     right: 6,
     backgroundColor: colors.surfaceTint,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.accentSoft,
   },
   selfCameraOff: {
     flex: 1,
@@ -914,7 +929,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   rotateCloseBtn: {
-    padding: 2,
+    padding: 6,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   networkAlertBanner: {
     position: 'absolute',
@@ -942,9 +961,11 @@ const styles = StyleSheet.create({
   },
   bannerActionBtn: {
     backgroundColor: colors.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 14,
+    minHeight: 44,
     borderRadius: radius.chip,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   bannerActionText: {
     color: colors.ink,
@@ -1038,29 +1059,32 @@ const styles = StyleSheet.create({
   },
   sideTextInput: {
     flex: 1,
-    height: 38,
+    height: 44,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.line,
     paddingHorizontal: 12,
     color: colors.ink,
+    fontSize: 16,
   },
   sideSendBtn: {
-    width: 38,
-    height: 38,
+    width: 44,
+    height: 44,
     backgroundColor: colors.accent,
-    borderRadius: 19,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
   },
   controlBar: {
-    height: 82,
+    minHeight: 88,
     backgroundColor: colors.bg,
     borderTopLeftRadius: radius.sheet,
     borderTopRightRadius: radius.sheet,
     ...shadows.sheet,
     justifyContent: 'center',
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
   },
   controlBarContent: {
     flexDirection: 'row',
@@ -1070,11 +1094,12 @@ const styles = StyleSheet.create({
   controlBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     marginHorizontal: 4,
-    borderRadius: radius.card,
-    minWidth: 54,
+    borderRadius: 25,
+    minWidth: 50,
+    minHeight: 50,
   },
   controlBtnActive: {
     backgroundColor: colors.surfaceTint,
@@ -1086,16 +1111,23 @@ const styles = StyleSheet.create({
   },
   endCallBtn: {
     backgroundColor: colors.accentStrong,
-    borderRadius: radius.full,
-    width: 54,
-    height: 54,
+    borderRadius: 30,
+    width: 60,
+    height: 60,
     paddingVertical: 0,
     marginLeft: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.accentStrong,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   endCallText: {
     color: colors.ink,
-    fontWeight: '700',
-    fontSize: 10,
+    fontWeight: '800',
+    fontSize: 11,
   },
   sheetChatContainer: {
     height: 360,
@@ -1136,12 +1168,13 @@ const styles = StyleSheet.create({
   },
   sheetChatInput: {
     flex: 1,
-    height: 44,
+    height: 48,
     borderWidth: 1,
     borderColor: colors.line,
     borderRadius: radius.card,
     paddingHorizontal: 14,
     color: colors.ink,
+    fontSize: 16,
   },
   sheetSendBtn: {
     width: 44,
@@ -1159,6 +1192,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
+    minHeight: 48,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
   },

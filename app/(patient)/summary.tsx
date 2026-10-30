@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   loadingContainer: {
     paddingVertical: 20,

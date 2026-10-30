@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { colors, radius, spacing, typography } from '../../theme/tokens';
+import { colors, radius, shadows, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore } from '../../store/consultationStore';
 import {
   TopBar,
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 110,
+    paddingBottom: 120,
   },
   heading: {
     color: colors.ink,
@@ -416,9 +417,11 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.bg,
     paddingHorizontal: spacing.base,
-    paddingVertical: 14,
+    paddingTop: 14,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
     borderTopWidth: 1,
     borderTopColor: colors.line,
+    ...shadows.sheet,
   },
   continueBtn: {
     width: '100%',

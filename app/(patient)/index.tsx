@@ -95,6 +95,7 @@ export default function HomeScreen() {
             activeOpacity={0.75}
             onPress={() => router.push('/(patient)/history')}
             style={styles.historyTopBtn}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             accessibilityRole="button"
             accessibilityLabel="Open consultation history"
           >
@@ -183,11 +184,23 @@ export default function HomeScreen() {
 
             {/* Reschedule and cancel secondary links */}
             <View style={styles.bookingLinksRow}>
-              <TouchableOpacity onPress={handleReschedule} style={styles.linkButton}>
+              <TouchableOpacity
+                onPress={handleReschedule}
+                style={styles.linkButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Reschedule appointment"
+              >
                 <Text style={[typography.smallBold, styles.linkText]}>Reschedule</Text>
               </TouchableOpacity>
               <View style={styles.linkDivider} />
-              <TouchableOpacity onPress={handleCancelBooking} style={styles.linkButton}>
+              <TouchableOpacity
+                onPress={handleCancelBooking}
+                style={styles.linkButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel appointment"
+              >
                 <Text style={[typography.smallBold, styles.cancelLinkText]}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -228,9 +241,11 @@ export default function HomeScreen() {
         <View style={styles.sheetOptionList}>
           {/* Option 1: Right Now (Immediate) */}
           <TouchableOpacity
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             onPress={handleChooseImmediate}
             style={styles.optionCard}
+            accessibilityRole="button"
+            accessibilityLabel="Right Now - Immediate consult with next available doctor, wait approximately 6 minutes"
           >
             <View style={styles.optionIconCircle}>
               <Zap size={24} color={colors.ink} />
@@ -251,9 +266,11 @@ export default function HomeScreen() {
 
           {/* Option 2: Preferred Time Slot (Schedule) */}
           <TouchableOpacity
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             onPress={handleChooseSchedule}
             style={[styles.optionCard, styles.scheduleOptionCard]}
+            accessibilityRole="button"
+            accessibilityLabel="Preferred Time Slot - Pick a convenient time slot and skip live queue"
           >
             <View style={[styles.optionIconCircle, styles.scheduleIconCircle]}>
               <Calendar size={24} color={colors.ink} />
@@ -284,14 +301,15 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   historyTopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surfaceTint,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    minHeight: 44,
     borderRadius: radius.chip,
     borderWidth: 1,
     borderColor: colors.accentSoft,
@@ -416,7 +434,9 @@ const styles = StyleSheet.create({
   },
   linkButton: {
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   linkText: {
     color: colors.ink,

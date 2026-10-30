@@ -66,7 +66,8 @@ export const Button: React.FC<ButtonProps> = ({
           backgroundColor: 'transparent',
           borderWidth: 0,
           paddingHorizontal: 8,
-          minHeight: 36,
+          minHeight: 44,
+          justifyContent: 'center',
         };
     }
   };
@@ -90,7 +91,7 @@ export const Button: React.FC<ButtonProps> = ({
   const getHeight = (): number => {
     switch (size) {
       case 'small':
-        return 40;
+        return 44;
       case 'large':
         return 56;
       case 'normal':

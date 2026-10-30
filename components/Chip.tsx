@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.chip,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

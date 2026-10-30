@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, radius, spacing, typography } from '../../theme/tokens';
+import { colors, radius, shadows, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore, ScheduledBooking } from '../../store/consultationStore';
 import { mockDoctors } from '../../mock/doctors';
 import {
@@ -125,8 +126,10 @@ export default function ScheduleScreen() {
                 return (
                   <TouchableOpacity
                     key={index}
-                    activeOpacity={0.75}
+                    activeOpacity={0.7}
                     onPress={() => setSelectedDayIndex(index)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${d.dayLabel}, ${d.dateLabel}`}
                     style={[
                       styles.dayCard,
                       isSelected ? styles.dayCardSelected : styles.dayCardNormal,
@@ -163,7 +166,10 @@ export default function ScheduleScreen() {
                 {MORNING_SLOTS.map((slot) => (
                   <TouchableOpacity
                     key={slot}
+                    activeOpacity={0.7}
                     onPress={() => setSelectedSlot(slot)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Time slot: ${slot}`}
                     style={[
                       styles.slotPill,
                       selectedSlot === slot ? styles.slotPillSelected : styles.slotPillNormal,
@@ -190,7 +196,10 @@ export default function ScheduleScreen() {
                 {AFTERNOON_SLOTS.map((slot) => (
                   <TouchableOpacity
                     key={slot}
+                    activeOpacity={0.7}
                     onPress={() => setSelectedSlot(slot)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Time slot: ${slot}`}
                     style={[
                       styles.slotPill,
                       selectedSlot === slot ? styles.slotPillSelected : styles.slotPillNormal,
@@ -217,7 +226,10 @@ export default function ScheduleScreen() {
                 {EVENING_SLOTS.map((slot) => (
                   <TouchableOpacity
                     key={slot}
+                    activeOpacity={0.7}
                     onPress={() => setSelectedSlot(slot)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Time slot: ${slot}`}
                     style={[
                       styles.slotPill,
                       selectedSlot === slot ? styles.slotPillSelected : styles.slotPillNormal,
@@ -379,7 +391,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 110,
+    paddingBottom: 120,
   },
   title: {
     color: colors.ink,
@@ -443,8 +455,10 @@ const styles = StyleSheet.create({
   slotPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 48,
     borderRadius: radius.card,
     borderWidth: 1.5,
     marginRight: 10,
@@ -500,9 +514,11 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.bg,
     paddingHorizontal: spacing.base,
-    paddingVertical: 14,
+    paddingTop: 14,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
     borderTopWidth: 1,
     borderTopColor: colors.line,
+    ...shadows.sheet,
   },
   confirmBtn: {
     width: '100%',

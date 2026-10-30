@@ -157,7 +157,7 @@ export default function RootLayout() {
               <View
                 style={[
                   styles.phoneShell,
-                  { height: Math.min(840, height - 76) },
+                  { height: Math.min(820, height - 80) },
                 ]}
               >
                 {/* Dynamic Island / Selfie Punchhole */}
@@ -357,6 +357,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
     overflow: 'hidden',
+    paddingTop: 36,
   },
   tabletShell: {
     backgroundColor: colors.bg,

@@ -382,8 +382,13 @@ export default function QueueScreen() {
               <View style={styles.slideIcon}>{currentSlide.icon}</View>
               <View style={styles.dotsRow}>
                 {CAROUSEL_SLIDES.map((_, i) => (
-                  <View
+                  <TouchableOpacity
                     key={i}
+                    activeOpacity={0.7}
+                    onPress={() => setActiveSlide(i)}
+                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Go to slide ${i + 1} of ${CAROUSEL_SLIDES.length}`}
                     style={[
                       styles.dot,
                       activeSlide === i ? styles.dotActive : styles.dotInactive,
@@ -526,7 +531,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 40,
+    paddingBottom: 110,
   },
   spinnerCard: {
     alignItems: 'center',
@@ -566,6 +571,7 @@ const styles = StyleSheet.create({
     height: 148,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
     position: 'relative',
     marginVertical: 6,
   },
@@ -804,6 +810,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
+    minHeight: 48,
   },
   leaveQueueText: {
     color: colors.inkSecondary,

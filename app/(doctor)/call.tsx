@@ -1297,9 +1297,10 @@ const styles = StyleSheet.create({
     borderRightColor: colors.line,
     padding: 12,
     backgroundColor: '#FAFAFA',
+    overflow: 'hidden',
   },
   resizeDivider: {
-    width: 24,
+    width: 18,
     backgroundColor: '#F1F5F9',
     borderLeftWidth: 1,
     borderRightWidth: 1,

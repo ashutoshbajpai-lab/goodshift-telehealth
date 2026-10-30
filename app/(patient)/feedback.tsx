@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, radius, spacing, typography } from '../../theme/tokens';
+import { colors, radius, shadows, spacing, typography } from '../../theme/tokens';
 import { useConsultationStore } from '../../store/consultationStore';
 import { callEngine } from '../../engine/callEngine';
 import {
@@ -126,7 +127,13 @@ export default function FeedbackScreen() {
           <Text style={[typography.caption, styles.stepCounterText]}>
             Question {currentStep} of {TOTAL_QUESTIONS}
           </Text>
-          <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}>
+          <TouchableOpacity
+            onPress={handleSkip}
+            style={styles.skipBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel="Skip this question"
+          >
             <Text style={[typography.smallBold, styles.skipText]}>Skip</Text>
           </TouchableOpacity>
         </View>
@@ -145,7 +152,10 @@ export default function FeedbackScreen() {
               {(['Yes', 'Partly', 'No'] as const).map((opt) => (
                 <TouchableOpacity
                   key={opt}
+                  activeOpacity={0.7}
                   onPress={() => setQ1(opt)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Option ${opt}`}
                   style={[
                     styles.choiceCard,
                     q1 === opt && styles.choiceCardSelected,
@@ -203,7 +213,10 @@ export default function FeedbackScreen() {
               {(['Yes', 'No'] as const).map((opt) => (
                 <TouchableOpacity
                   key={opt}
+                  activeOpacity={0.7}
                   onPress={() => setQ3(opt)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Option ${opt}`}
                   style={[
                     styles.choiceCard,
                     q3 === opt && styles.choiceCardSelected,
@@ -296,7 +309,10 @@ export default function FeedbackScreen() {
               {(['Good', 'Some issues', 'Poor'] as const).map((opt) => (
                 <TouchableOpacity
                   key={opt}
+                  activeOpacity={0.7}
                   onPress={() => setQ7(opt)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Option ${opt}`}
                   style={[
                     styles.choiceCard,
                     q7 === opt && styles.choiceCardSelected,
@@ -390,7 +406,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: 100,
+    paddingBottom: 110,
   },
   headerInfo: {
     flexDirection: 'row',
@@ -404,13 +420,17 @@ const styles = StyleSheet.create({
   },
   skipBtn: {
     padding: 6,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   skipText: {
     color: colors.inkSecondary,
   },
   questionCard: {
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   questionTitle: {
     color: colors.ink,
@@ -425,14 +445,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   choiceCard: {
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
+    minHeight: 52,
     borderRadius: radius.card,
     borderWidth: 1.5,
     borderColor: colors.line,
     marginBottom: 10,
     backgroundColor: colors.bg,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   choiceCardSelected: {
     borderColor: colors.accent,
@@ -466,6 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     padding: 14,
     color: colors.ink,
+    fontSize: 16,
     minHeight: 120,
     textAlignVertical: 'top',
   },
@@ -496,8 +519,10 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.bg,
     paddingHorizontal: spacing.base,
-    paddingVertical: 14,
+    paddingTop: 14,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
     borderTopWidth: 1,
     borderTopColor: colors.line,
+    ...shadows.sheet,
   },
 });
